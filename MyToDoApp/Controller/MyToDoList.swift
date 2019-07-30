@@ -11,9 +11,14 @@ import UIKit
 class MyToDoList: UITableViewController {
 
     var listArray = ["veggie", "lentils", "soap"]
+    let defaults = UserDefaults.standard
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+       
+        listArray = defaults.array(forKey: "nsrdefault") as! [String]
+        
     }
 
 
@@ -22,7 +27,7 @@ class MyToDoList: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+      
         let cell = tableView.dequeueReusableCell(withIdentifier: "todolist", for: indexPath)
         cell.textLabel?.text = listArray[indexPath.row]
         return cell
@@ -37,6 +42,34 @@ class MyToDoList: UITableViewController {
             cell?.accessoryType = .checkmark
         }
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    @IBAction func addItem(_ sender: UIBarButtonItem) {
+        
+        var textFieldText: UITextField?
+        
+        let alert = UIAlertController(title: "Add Item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (alertaction) in
+            
+            let text = textFieldText?.text
+            if text != nil {
+                self.listArray.append(text!)
+                self.defaults.set(self.listArray, forKey: "nsrdefault")
+                self.tableView.reloadData()
+            }
+            
+        }
+        
+        alert.addAction(action)
+        
+        alert.addTextField { (text) in
+            text.placeholder = "Enter new item"
+            textFieldText = text
+        }
+    
+        
+        present(alert, animated: true)
     }
 }
 
