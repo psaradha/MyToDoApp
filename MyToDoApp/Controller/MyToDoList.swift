@@ -10,14 +10,18 @@ import UIKit
 
 class MyToDoList: UITableViewController {
 
-    var listArray = ["veggie", "lentils", "soap"]
+    var listArray = [ListChecked]()
     let defaults = UserDefaults.standard
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
-        listArray = defaults.array(forKey: "nsrdefault") as! [String]
+       let item1 = ListChecked()
+        item1.listItemName = "veggie"
+        listArray.append(item1)
+        defaults.set(listArray, forKey: "nsrdefaults")
+        
+        let item = defaults.array(forKey: "nsrdefaults") as! [ListChecked]
+        listArray = item
         
     }
 
@@ -27,21 +31,18 @@ class MyToDoList: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "todolist", for: indexPath)
-        cell.textLabel?.text = listArray[indexPath.row]
+        cell.textLabel?.text = listArray[indexPath.row].listItemName
+        cell.accessoryType = listArray[indexPath.row].checkValue ? .checkmark : .none
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let cell = tableView.cellForRow(at: indexPath)
-        if cell?.accessoryType == .checkmark{
-            cell?.accessoryType = .none
-        }else{
-            cell?.accessoryType = .checkmark
-        }
+        listArray[indexPath.row].checkValue = !listArray[indexPath.row].checkValue
         tableView.deselectRow(at: indexPath, animated: true)
+        tableView.reloadData()
     }
     
     @IBAction func addItem(_ sender: UIBarButtonItem) {
@@ -54,7 +55,10 @@ class MyToDoList: UITableViewController {
             
             let text = textFieldText?.text
             if text != nil {
-                self.listArray.append(text!)
+                
+                let newItem = ListChecked()
+                newItem.listItemName = text!
+                self.listArray.append(newItem)
                 self.defaults.set(self.listArray, forKey: "nsrdefault")
                 self.tableView.reloadData()
             }
